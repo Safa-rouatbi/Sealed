@@ -1,17 +1,14 @@
-public class CreateSecretRequest {
 
-    @NotBlank
-    private String ciphertext;
+package com.sealed.dto;
 
-    @NotBlank
-    private String iv;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-    private int ttlSeconds;
-
-    public String getCiphertext() { return ciphertext; }
-    public void setCiphertext(String ciphertext) { this.ciphertext = ciphertext; }
-    public String getIv() { return iv; }
-    public void setIv(String iv) { this.iv = iv; }
-    public int getTtlSeconds() { return ttlSeconds; }
-    public void setTtlSeconds(int ttlSeconds) { this.ttlSeconds = ttlSeconds; }
+public record CreateSecretRequest(
+        @NotBlank @Size(max = 100_000) @Pattern(regexp = "[A-Za-z0-9_-]+") String ciphertext,
+        @NotBlank @Size(max = 32) @Pattern(regexp = "[A-Za-z0-9_-]+") String iv,
+        @Min(60) long ttlSeconds) {
 }
+

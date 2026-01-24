@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.sealed.dto.CreateSecretRequest;
+import com.sealed.dto.SecretResponse;
 import com.sealed.repository.SecretRepository;
 
 @Service
@@ -38,4 +39,15 @@ public class SecretService {
         secureRandom.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
+     public SecretResponse getSecret(String id) {
+        String value = secretRepository.get(id);
+        if (value == null) {
+            throw new RuntimeException("Secret introuvable");
+        }
+        String[] parts = value.split(":");
+        return new SecretResponse(parts[0], parts[1]);
+    }
+
+  
+    
 }

@@ -18,5 +18,10 @@ public class SecretRepository {
     public void save(String id, String iv, String ciphertext, Duration ttl) {
         redis.opsForValue().set(KEY_PREFIX + id, iv + ":" + ciphertext, ttl);
     }
+
+    public String get(String id) {
+    String value = redis.opsForValue().getAndDelete("secret:" + id);
+    return value;
+}
 }
 

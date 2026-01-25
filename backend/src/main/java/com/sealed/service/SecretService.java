@@ -42,7 +42,7 @@ public class SecretService {
      public SecretResponse getSecret(String id) {
         String value = secretRepository.get(id);
         if (value == null) {
-            throw new RuntimeException("Secret introuvable");
+            throw new SecretNotFoundException();
         }
         String[] parts = value.split(":");
         return new SecretResponse(parts[0], parts[1]);

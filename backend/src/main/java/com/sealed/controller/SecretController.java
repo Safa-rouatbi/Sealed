@@ -3,7 +3,9 @@ package com.sealed.controller;
 
 import java.util.Map;
 
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,11 +43,13 @@ public class SecretController {
         return Map.of("error", e.getMessage());
     }
 
-     @GetMapping("/{id}")
-    public SecretResponse get(@PathVariable String id) {
-        return secretService.getSecret(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<SecretResponse> get(@PathVariable String id) {
+        // no-store : empêche le navigateur et les proxys de garder le secret en cache
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .body(secretService.getSecret(id));
     }
-
   
 }
  

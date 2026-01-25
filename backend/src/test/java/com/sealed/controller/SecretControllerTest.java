@@ -2,9 +2,11 @@ package com.sealed.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.sealed.dto.SecretResponse;
+import com.sealed.service.SecretNotFoundException;
 import com.sealed.service.SecretService;
 
 @WebMvcTest(SecretController.class)
@@ -65,5 +69,34 @@ class SecretControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isBadRequest());
+    }
+
+
+
+
+    @Test
+    void testGetSecretExistant() throws Exception {
+        when(secretService.getSecret("id123")).thenReturn(new SecretResponse("def", "abc"));
+
+        mockMvc.perform(get("/api/secrets/id123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.iv").value("def"))
+                .andExpect(jsonPath("$.ciphertext").value("abc"));
+    }
+
+    @Test
+    void testGetSecretEnvoieNoStore() throws Exception {
+        when(secretService.getSecret("id123")).thenReturn(new SecretResponse("def", "abc"));
+
+        mockMvc.perform(get("/api/secrets/id123"))
+                .andExpect(header().string("Cache-Control", "no-store"));
+    }
+
+    @Test
+    void testGetSecretIntrouvable() throws Exception {
+        when(secretService.getSecret("id123")).thenThrow(new SecretNotFoundException());
+
+        mockMvc.perform(get("/api/secrets/id123"))
+                .andExpect(status().isNotFound());
     }
 }

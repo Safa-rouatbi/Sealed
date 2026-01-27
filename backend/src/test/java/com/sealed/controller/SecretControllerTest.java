@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.sealed.dto.SecretResponse;
 import com.sealed.service.SecretNotFoundException;
 import com.sealed.service.SecretService;
+import com.sealed.config.RateLimitIntercepteur;
 
 @WebMvcTest(SecretController.class)
 class SecretControllerTest {
@@ -27,6 +29,13 @@ class SecretControllerTest {
 
     @MockBean
     SecretService secretService;
+    @MockBean
+    RateLimitIntercepteur rateLimitIntercepteur;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        when(rateLimitIntercepteur.preHandle(any(), any(), any())).thenReturn(true);
+    }
 
     @Test
     void testCreate() throws Exception {
@@ -89,7 +98,7 @@ class SecretControllerTest {
         when(secretService.getSecret("id123")).thenReturn(new SecretResponse("def", "abc"));
 
         mockMvc.perform(get("/api/secrets/id123"))
-                .andExpect(header().string("Cache-Control", "no-store"));
+                   .andExpect(header().string("Cache-Control", "no-store"));
     }
 
     @Test
@@ -97,6 +106,6 @@ class SecretControllerTest {
         when(secretService.getSecret("id123")).thenThrow(new SecretNotFoundException());
 
         mockMvc.perform(get("/api/secrets/id123"))
-                .andExpect(status().isNotFound());
+             .andExpect(status().isNotFound());
     }
 }

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +46,7 @@ class SecretServiceTest {
         String id = service.createSecret(request);
 
         assertNotNull(id);
-    }
+ }
 
     @Test
     void testGetSecretExistant() {
@@ -57,8 +57,7 @@ class SecretServiceTest {
         assertEquals("def", response.getIv());
         assertEquals("abc", response.getCiphertext());
     }
-
-    @Test
+   @Test
     void testGetSecretIntrouvable() {
         when(repository.get("id1")).thenReturn(null);
 

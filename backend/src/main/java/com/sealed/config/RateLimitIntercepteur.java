@@ -40,7 +40,7 @@ public class RateLimitIntercepteur implements HandlerInterceptor {
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
             response.setHeader("Retry-After", String.valueOf(windowSeconds));
-            response.getWriter().write("{\"error\":\"Trop de requêtes, réessayez plus tard\"}");
+            response.getWriter().write("{\"error\":\"Trop de requetes, reessayez plus tard\"}");
             return false;
         }
 

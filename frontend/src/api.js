@@ -1,7 +1,27 @@
+function erreurAvecStatus(message, status) {
+  const erreur = new Error(message);
+  erreur.status = status;
+  return erreur;
+}
+
+async function appeler(url, options) {
+  let reponse;
+  try {
+    reponse = await fetch(url, options);
+  } catch {
+    throw erreurAvecStatus("Serveur injoignable", 0);
+  }
+
+  if (!reponse.ok) {
+    throw erreurAvecStatus("Erreur HTTP " + reponse.status, reponse.status);
+  }
+  return reponse.json();
+}
+
 export async function creerSecret(payload, ttlSeconds) {
   const parts = payload.split(".");
 
-  const reponse = await fetch("/api/secrets", {
+  const data = await appeler("/api/secrets", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -10,27 +30,10 @@ export async function creerSecret(payload, ttlSeconds) {
       ttlSeconds: ttlSeconds,
     }),
   });
-
-  if (!reponse.ok) {
-    const erreur = new Error("Erreur HTTP " + reponse.status);
-    erreur.status = reponse.status;
-    throw erreur;
-  }
-  
-
-  const data = await reponse.json();
   return data.id;
 }
 
 export async function lireSecret(id) {
-  const reponse = await fetch("/api/secrets/" + encodeURIComponent(id));
-
-  if (!reponse.ok) {
-    const erreur = new Error("Erreur HTTP " + reponse.status);
-    erreur.status = reponse.status;
-    throw erreur;
-  }
-
-  const data = await reponse.json();
+  const data = await appeler("/api/secrets/" + encodeURIComponent(id));
   return data.iv + "." + data.ciphertext;
 }

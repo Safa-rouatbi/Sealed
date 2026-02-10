@@ -1,0 +1,244 @@
+:root {
+  --fond: #eaf2ef;
+  --carte: #ffffff;
+  --champ: #f4f8f7;
+  --encre: #1d2928;
+  --encre-douce: #5a6b69;
+  --trait: #dce7e4;
+  --accent: #1f7a72;
+  --accent-fonce: #17615b;
+  --sur-accent: #ffffff;
+  --erreur-fond: #fdeeea;
+  --erreur-texte: #8f2a17;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #101817;
+    --carte: #1a2322;
+    --champ: #212c2b;
+    --encre: #e6efed;
+    --encre-douce: #9fb1ae;
+    --trait: #2c3a38;
+    --accent: #4fb3a9;
+    --accent-fonce: #6cc7be;
+    --sur-accent: #0d1514;
+    --erreur-fond: #3a1f1a;
+    --erreur-texte: #f2b3a6;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--encre);
+  font: 1rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 2.5rem;
+}
+
+.logo {
+  color: var(--accent);
+  font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.devise {
+  margin: 0;
+  color: var(--encre-douce);
+  font-size: 0.875rem;
+}
+
+.page {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1rem 5rem;
+}
+
+.carte {
+  width: 100%;
+  max-width: 38rem;
+  padding: 2.25rem 2rem 2.5rem;
+  border: 1px solid var(--trait);
+  border-radius: 24px;
+  background: var(--carte);
+  box-shadow: 0 2px 12px rgba(20, 50, 46, 0.06);
+}
+
+.intro {
+  margin: 0 0 1.5rem;
+  color: var(--encre-douce);
+}
+
+label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+textarea,
+input,
+select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--trait);
+  border-radius: 14px;
+  background: var(--champ);
+  color: var(--encre);
+  font: inherit;
+}
+
+textarea {
+  min-height: 10rem;
+  resize: vertical;
+}
+
+textarea:focus,
+input:focus,
+select:focus,
+button:focus-visible,
+.logo:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.champ {
+  flex: 1 1 11rem;
+}
+
+button {
+  padding: 0.8rem 1.6rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.principal {
+  background: var(--accent);
+  color: var(--sur-accent);
+}
+
+.principal:hover:not(:disabled) {
+  background: var(--accent-fonce);
+  border-color: var(--accent-fonce);
+}
+
+.secondaire {
+  background: transparent;
+  color: var(--accent);
+}
+
+.secondaire:hover {
+  background: var(--champ);
+}
+
+.erreur {
+  margin: 1.5rem 0 0;
+  padding: 0.8rem 1.1rem;
+  border-radius: 14px;
+  background: var(--erreur-fond);
+  color: var(--erreur-texte);
+}
+
+.resultat {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border-radius: 18px;
+  background: var(--champ);
+}
+
+.resultat input {
+  background: var(--carte);
+}
+
+.copie {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.copie input {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.875rem;
+}
+
+.note {
+  margin: 0.9rem 0 0;
+  color: var(--encre-douce);
+  font-size: 0.875rem;
+}
+
+.secret {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--trait);
+  border-radius: 14px;
+  background: var(--champ);
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 30rem) {
+  .entete {
+    padding: 1.1rem 1.25rem;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .page {
+    padding: 0.5rem 0.75rem 3rem;
+  }
+
+  .carte {
+    padding: 1.5rem 1.25rem 1.75rem;
+    border-radius: 20px;
+  }
+
+  .ligne button {
+    width: 100%;
+  }
+}

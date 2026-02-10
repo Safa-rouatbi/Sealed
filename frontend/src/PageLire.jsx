@@ -1,29 +1,24 @@
 import { useState } from "react";
 import { dechiffrer } from "./crypto.js";
 import { lireSecret } from "./api.js";
-
-function messageLecture(erreur) {
-  if (erreur.status === 404) {
-    return "Ce secret n'existe pas, a expiré ou a déjà été lu.";
-  }
-  if (erreur.status === 429) {
-    return "Trop de requêtes, réessaie dans une minute.";
-  }
-  return "Impossible de lire le secret.";
-}
+import { messageErreur } from "./erreurs.js";
 
 function PageLire({ id }) {
   const cle = window.location.hash.slice(1);
   const [texte, setTexte] = useState("");
   const [erreur, setErreur] = useState("");
+  const [enCours, setEnCours] = useState(false);
+
   async function afficher() {
     setErreur("");
+    setEnCours(true);
 
     let payload;
     try {
       payload = await lireSecret(id);
     } catch (e) {
-      setErreur(messageLecture(e));
+      setErreur(messageErreur(e));
+      setEnCours(false);
       return;
     }
 
@@ -32,28 +27,41 @@ function PageLire({ id }) {
     } catch {
       setErreur("Impossible de déchiffrer : la clé du lien est incorrecte. Le secret a été supprimé.");
     }
+    setEnCours(false);
   }
 
   if (!cle) {
-    return <p>Lien invalide : la clé est manquante.</p>;
+    return (
+      <p className="erreur" role="alert">
+        Lien invalide : la clé est manquante.
+      </p>
+    );
   }
 
   return (
-    <div>
-      <h1>Sealed</h1>
+    <section>
       {texte ? (
         <div>
-          <p>Voici le secret. Il a été supprimé du serveur, copie-le maintenant :</p>
-          <pre>{texte}</pre>
+          <p className="intro">Voici le secret. Il a été supprimé du serveur : copie-le maintenant.</p>
+          <pre className="secret">{texte}</pre>
         </div>
       ) : (
         <div>
-          <p>Ce secret ne peut être lu qu'une seule fois.</p>
-          <button onClick={afficher}>Afficher le secret</button>
+          <p className="intro">
+            Ce secret ne peut être lu qu'une seule fois. Une fois affiché, il est supprimé du serveur.
+          </p>
+          <button className="principal" onClick={afficher} disabled={enCours}>
+            Afficher le secret
+          </button>
         </div>
       )}
-      {erreur && <p>{erreur}</p>}
-    </div>
+
+      {erreur && (
+        <p className="erreur" role="alert">
+          {erreur}
+        </p>
+      )}
+    </section>
   );
 }
 

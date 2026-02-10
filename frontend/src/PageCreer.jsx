@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { chiffrer } from "./crypto.js";
 import { creerSecret } from "./api.js";
+import { messageErreur } from "./erreurs.js";
+
 const MAX_OCTETS = 74000;
 
 const DUREES = [
@@ -26,59 +28,85 @@ function PageCreer() {
   const [lien, setLien] = useState("");
   const [erreur, setErreur] = useState("");
   const [copie, setCopie] = useState(false);
+  const [enCours, setEnCours] = useState(false);
 
   async function creer() {
     const probleme = verifierTexte(texte);
     setErreur(probleme);
     setCopie(false);
+    setLien("");
     if (probleme) {
       return;
     }
 
+    setEnCours(true);
     try {
       const { payload, cle } = await chiffrer(texte);
       const id = await creerSecret(payload, secondes);
-      // la clé est après le # dans l url
       setLien(`${window.location.origin}/${id}#${cle}`);
       setTexte("");
     } catch (e) {
-      setErreur(e.status === 429 ? "Trop de requêtes, réessaie dans une minute." : "Impossible de créer le secret.");
+      setErreur(messageErreur(e));
     }
+    setEnCours(false);
   }
 
   async function copier() {
-    await navigator.clipboard.writeText(lien);
-    setCopie(true);
+    try {
+      await navigator.clipboard.writeText(lien);
+      setCopie(true);
+    } catch {
+      setErreur("Copie impossible. Sélectionne le lien à la main.");
+    }
   }
 
   return (
-    <div>
-      <h1>Sealed</h1>
-      <p>Écris un secret : il est chiffré dans ton navigateur et ne peut être lu qu'une seule fois.</p>
+    <section>
+      <p className="intro">
+        Écris un secret. Il est chiffré dans ton navigateur et ne peut être lu qu'une seule fois.
+      </p>
 
-      <textarea rows="8" cols="50" value={texte} onChange={(e) => setTexte(e.target.value)} />
+      <label htmlFor="texte">Ton secret</label>
+      <textarea id="texte" value={texte} onChange={(e) => setTexte(e.target.value)} />
 
-      <div>
-        <select value={secondes} onChange={(e) => setSecondes(Number(e.target.value))}>
-          {DUREES.map((duree) => (
-            <option key={duree.secondes} value={duree.secondes}>
-              {duree.label}
-            </option>
-          ))}
-        </select>
-        <button onClick={creer}>Créer le lien</button>
+      <div className="ligne">
+        <div className="champ">
+          <label htmlFor="duree">Expire après</label>
+          <select id="duree" value={secondes} onChange={(e) => setSecondes(Number(e.target.value))}>
+            {DUREES.map((duree) => (
+              <option key={duree.secondes} value={duree.secondes}>
+                {duree.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button className="principal" onClick={creer} disabled={enCours}>
+          Créer le lien
+        </button>
       </div>
 
-      {erreur && <p>{erreur}</p>}
+      {erreur && (
+        <p className="erreur" role="alert">
+          {erreur}
+        </p>
+      )}
 
       {lien && (
-        <div>
-          <p>Envoie ce lien (il ne fonctionne qu'une fois) :</p>
-          <input readOnly size="60" value={lien} />
-          <button onClick={copier}>{copie ? "Copié !" : "Copier"}</button>
+        <div className="resultat">
+          <label htmlFor="lien">Lien à partager</label>
+          <div className="copie">
+            <input id="lien" readOnly value={lien} onFocus={(e) => e.target.select()} />
+            <button className="secondaire" onClick={copier}>
+              {copie ? "Copié" : "Copier"}
+            </button>
+          </div>
+          <p className="note">
+            Ce lien ne fonctionne qu'une fois. La clé de déchiffrement se trouve après le # : elle n'est jamais
+            envoyée au serveur.
+          </p>
         </div>
       )}
-    </div>
+    </section>
   );
 }
 

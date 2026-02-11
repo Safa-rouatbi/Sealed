@@ -5,28 +5,16 @@ Partage de secrets à usage unique. Le texte est chiffré **dans le navigateur**
 ## Comment ça marche
 
 ```mermaid
-sequenceDiagram
-    actor A as Expéditeur
-    participant NA as Navigateur A
-    participant S as Serveur
-    participant R as Redis
-    participant NB as Navigateur B
-    actor B as Destinataire
-
-    A->>NA: écrit le secret
-    NA->>NA: génère clé AES-256 + IV, chiffre
-    NA->>S: POST /api/secrets (texte chiffré, IV, durée)
-    S->>R: SET secret:id "iv:texte chiffré" EX durée
-    S-->>NA: id
-    NA-->>A: lien /id#clé
-    A->>B: envoie le lien
-    B->>NB: ouvre le lien, clique sur Afficher
-    NB->>S: GET /api/secrets/id (sans la clé)
-    S->>R: GETDEL secret:id
-    R-->>S: iv:texte chiffré (puis supprimé)
-    S-->>NB: IV + texte chiffré
-    NB->>NB: déchiffre avec la clé du #
-    NB-->>B: affiche le secret
+flowchart LR
+    subgraph Nav[Navigateur : voit tout]
+        T[Secret en clair] --> C[Chiffrement AES-GCM]
+        K[Clé]
+    end
+    subgraph Srv[Serveur et Redis : ne voient que du chiffré]
+        D[Texte chiffré + IV]
+    end
+    C -->|envoyé| D
+    K -.->|jamais envoyée : reste après le #| Srv
 ```
 
 - La clé est placée après le `#` du lien : le navigateur ne l'envoie jamais au serveur.
